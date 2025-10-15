@@ -27,6 +27,7 @@
 
     git
     rustup
+    firefox # En attendant que Epiphany implémente passkey.
     
     # I prefer using the 'Epiphany' web browser rather
     # than firefox, I found Epiphany more friendly/sexy.
