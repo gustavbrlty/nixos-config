@@ -21,9 +21,14 @@
   # release notes.
   home.stateVersion = "25.05"; # Please read the comment before changing.
 
+  # In order to be able to use x11docker (cf. bellow).
+  services.podman.enable = true;
+
   # The home.packages option allows you to install Nix packages into your
   # environment.
   home.packages = with pkgs; [
+
+    x11docker # In order to be able to launch GUI from CLI.
 
     git
     rustup

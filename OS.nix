@@ -47,12 +47,14 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  services.xserver.displayManager.startx.enable = true;
 
-  # Enable the GNOME Desktop Environment.
-  services.displayManager.gdm.enable = true;
-  services.desktopManager.gnome.enable = true;
-  services.displayManager.autoLogin.enable = true;
-  services.displayManager.autoLogin.user = "gustav";
+  # If I want to enable the GNOME Desktop Environment.
+  # services.displayManager.gdm.enable = true;
+  # services.desktopManager.gnome.enable = true;
+
+  # services.displayManager.autoLogin.enable = true;
+  # services.displayManager.autoLogin.user = "gustav";
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -115,9 +117,10 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     tree
-  #  wget
+
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
