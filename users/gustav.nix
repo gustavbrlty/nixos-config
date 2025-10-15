@@ -27,10 +27,15 @@
 
     git
     rustup
-    firefox # En attendant que Epiphany implémente passkey.
     
     # I prefer using the 'Epiphany' web browser rather
-    # than firefox, I found Epiphany more friendly/sexy.
+    # than Firefox; I found Epiphany more sexy 🔥 ;).
+    epiphany
+   
+    # However Epiphany doesn't have passkey implented yet,
+    # so if I need to connect to an account with my YubiKey
+    # I would simply use Firefox at the moment.
+    firefox
 
     # Mes clés SSH sont stockées sur YubiKey.
     yubikey-manager
