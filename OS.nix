@@ -10,6 +10,11 @@
       ./hardware/common.nix
       inputs.home-manager.nixosModules.default
     ];
+  
+  # If I'm not using a desktop environment, 
+  # this parameter is needed for home-manager
+  # to work properly.
+  programs.dconf.enable = true;
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
