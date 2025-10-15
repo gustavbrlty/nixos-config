@@ -54,6 +54,7 @@
     extraConfig = {
       url."git@github-kylak:kylak".insteadOf = "git@github.com:kylak";
       url."git@github-gustavbrlty:gustavbrlty".insteadOf = "git@github.com:gustavbrlty";
+      safe.directory = "/etc/nixos"; # To save the NixOS config.
     };
   };
   programs.ssh.enable = true;

@@ -87,12 +87,6 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  users.users.root = {
-    packages = with pkgs; [
-      git # In order to manage properly the git repository for the NixOS config.
-    ];
-  };
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   # This users.users.gustav config cannot be managed by home-manager.
   users.users.gustav = {
