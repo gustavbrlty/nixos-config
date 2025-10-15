@@ -1,11 +1,14 @@
 { config, pkgs, ... }:
 {
+
   networking.wireless = {
     enable = true;
-    network = {
+    networks = {
+
       "Ani ben Hashem" = {
         psk = "Amen ve amen";
       };
+
     };
   };
 }
