@@ -70,6 +70,11 @@
       user = "git";
       identityFile = "~/.ssh/YubiKey_SSH_2.pub";
     };
+    "c" = {
+      hostname = "c";
+      user = "git";
+      identityFile = "~/.ssh/YubiKey_SSH_1.pub";
+    };
     "*" = {};
   };
   # Configure SSH pour utiliser la clé PIV stockée sur la YubiKey.
