@@ -123,6 +123,8 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
 
+    fbterm # Add the following features to the CLI : mouse, scrolling, UTF-8, and 256-color.
+
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     tree
 
