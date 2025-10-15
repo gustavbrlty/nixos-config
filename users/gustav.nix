@@ -4,7 +4,7 @@
 
   # We want the user to be able to use qemu.
   imports = [
-    ../../modules/qemu_virtu.nix
+    ../modules/qemu_virtu.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should

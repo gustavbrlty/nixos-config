@@ -7,7 +7,7 @@
 {
   imports =
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+      ./hardware/global.nix
       inputs.home-manager.nixosModules.default
     ];
 
@@ -88,23 +88,18 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
+  # This users.users.gustav config cannot be managed by home-manager.
   users.users.gustav = {
     isNormalUser = true;
     description = "Gustav";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-    #  thunderbird
-    ];
   };
 
-  # ideally firefox would be in the home-manager but
-  # it had actually not be that easy, so for now I let it here.
-
   home-manager = {
-	extraSpecialArgs = { inherit inputs; };
-	users = {
-		"gustav" = import ./home.nix;
-	};
+    extraSpecialArgs = { inherit inputs; };
+      users = {
+        "gustav" = import users/gustav.nix;
+      };
   };
 
   # Allow unfree packages
