@@ -34,7 +34,6 @@
     vim
     git
     rustup
-    obconf
     
     # I prefer using the 'Epiphany' web browser rather
     # than Firefox; I found Epiphany more sexy 🔥 ;).
@@ -47,6 +46,8 @@
     # implented yet, so if I need to connect to an account 
     # with my YubiKey I would simply use Firefox at the moment.
     firefox
+
+    vlc
 
     # Mes clés SSH sont stockées sur YubiKey.
     yubikey-manager
@@ -65,6 +66,15 @@
     #   echo "Hello, ${config.home.username}!"
     # '')
   ];
+
+  programs.obs-studio = {
+    enable = true;
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+      obs-backgroundremoval
+      obs-pipewire-audio-capture
+    ];
+  };
 
   programs.git = {
     enable = true;
@@ -132,34 +142,169 @@
     # '';
    
     ".config/openbox/rc.xml".source = pkgs.writeText "openbox-rc.xml" ''
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!-- Configuration Openbox générée pour NixOS -->
-      <openbox_config xmlns="http://openbox.org/3.4/rc">
-        <!-- Vos autres sections ici (thèmes, raccourcis, etc.) -->
-        <!-- Exemple basique pour les applications -->
-        <applications>
-          <!-- Règle pour Qutebrowser : pas de décorations -->
-          <application class="qutebrowser">
-            <decor>no</decor>  <!-- Désactive les décorations (barre de titre, bordures) -->
-            <!-- Optionnel : maximiser par défaut -->
-            <!-- <maximized>yes</maximized> -->
-          </application>
-          <application class="firefox">
-            <decor>no</decor>  <!-- Désactive les décorations (barre de titre, bordures) -->
-            <!-- Optionnel : maximiser par défaut -->
-            <!-- <maximized>yes</maximized> -->
-          </application>
-        </applications>
-        <mouse>
-          <context name="Root">
-            <mousebind button="Right" action="Press">
-              <action name="ShowMenu">
-                <menu>root-menu</menu>
-              </action>
-            </mousebind>
-          </context>
-        </mouse>
-      </openbox_config>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuration Openbox générée pour NixOS -->
+<openbox_config>
+<!-- Vos autres sections ici (thèmes, raccourcis, etc.) -->
+<!-- Exemple basique pour les applications -->
+<applications>
+<!-- Règle pour Qutebrowser : pas de décorations -->
+<application class="qutebrowser">
+<decor>no</decor>  <!-- Désactive les décorations (barre de titre, bordures) -->
+<!-- Optionnel : maximiser par défaut -->
+<!-- <maximized>yes</maximized> -->
+</application>
+<application class="firefox">
+<decor>no</decor>  <!-- Désactive les décorations (barre de titre, bordures) -->
+<!-- Optionnel : maximiser par défaut -->
+<!-- <maximized>yes</maximized> -->
+</application>
+</applications>
+<mouse>
+<!-- CONTEXTE RACINE (bureau) -->
+<context name="Root">
+<!-- Menu sur clic droit du bureau -->
+<mousebind button="Right" action="Press">
+<action name="ShowMenu">
+<menu>root-menu</menu>
+</action>
+</mousebind>
+</context>
+
+<!-- CONTEXTE FRAME (cadre de fenêtre) -->
+<context name="Frame">
+<!-- Menu sur clic droit du cadre -->
+<mousebind button="Right" action="Press">
+<action name="ShowMenu">
+<menu>client-menu</menu>
+</action>
+</mousebind>
+
+<!-- Déplacement avec Alt + Clic gauche -->
+<mousebind button="A-Left" action="Drag">
+<action name="Move"/>
+</mousebind>
+
+<!-- Redimensionnement libre avec Alt + Clic droit -->
+<mousebind button="A-Right" action="Drag">
+<action name="Resize"/>
+</mousebind>
+</context>
+
+<!-- CONTEXTE TITLEBAR (barre de titre) -->
+<context name="Titlebar">
+<!-- Menu sur clic droit de la barre de titre -->
+<mousebind button="Right" action="Press">
+<action name="ShowMenu">
+<menu>client-menu</menu>
+</action>
+</mousebind>
+
+<!-- Déplacement avec clic normal -->
+<mousebind button="Left" action="Drag">
+<action name="Move"/>
+</mousebind>
+
+<!-- Maximiser avec double-clic -->
+<mousebind button="Left" action="DoubleClick">
+<action name="ToggleMaximize"/>
+</mousebind>
+</context>
+
+<!-- BORDS - Redimensionnement unidirectionnel -->
+<context name="Top">
+<mousebind button="Left" action="Drag">
+<action name="Resize">
+<edge>top</edge>
+</action>
+</mousebind>
+</context>
+
+<context name="Bottom">
+<mousebind button="Left" action="Drag">
+<action name="Resize">
+<edge>bottom</edge>
+</action>
+</mousebind>
+</context>
+
+<context name="Left">
+<mousebind button="Left" action="Drag">
+<action name="Resize">
+<edge>left</edge>
+</action>
+</mousebind>
+</context>
+
+<context name="Right">
+<mousebind button="Left" action="Drag">
+<action name="Resize">
+<edge>right</edge>
+</action>
+</mousebind>
+</context>
+
+<context name="TLCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"/>
+</mousebind>
+</context>
+<context name="TRCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"/>
+</mousebind>
+</context>
+<context name="BLCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"/>
+</mousebind>
+</context>
+<context name="BRCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"/>
+</mousebind>
+</context>
+
+<context name="Desktop">
+<mousebind button="Up" action="Click">
+<action name="GoToDesktop"><to>previous</to></action>
+</mousebind>
+<mousebind button="Down" action="Click">
+<action name="GoToDesktop"><to>next</to></action>
+</mousebind>
+</context>
+</mouse>
+
+<keyboard>
+<!-- Navigation entre bureaux -->
+<keybind key="C-A-Left">
+<action name="GoToDesktop"><to>left</to></action>
+</keybind>
+<keybind key="C-A-Right">
+<action name="GoToDesktop"><to>right</to></action>
+</keybind>
+<keybind key="C-A-Up">
+<action name="GoToDesktop"><to>up</to></action>
+</keybind>
+<keybind key="C-A-Down">
+<action name="GoToDesktop"><to>down</to></action>
+</keybind>
+
+<!-- Accès direct aux bureaux -->
+<keybind key="S-A-1">
+<action name="GoToDesktop"><to>1</to></action>
+</keybind>
+<keybind key="S-A-2">
+<action name="GoToDesktop"><to>2</to></action>
+</keybind>
+<keybind key="S-A-3">
+<action name="GoToDesktop"><to>3</to></action>
+</keybind>
+<keybind key="S-A-4">
+<action name="GoToDesktop"><to>4</to></action>
+</keybind>
+</keyboard>
+</openbox_config>
     '';
 
   };

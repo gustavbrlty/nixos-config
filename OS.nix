@@ -136,6 +136,8 @@
     xorg.twm
 
     openbox
+    obconf
+
     i3
     fvwm
     matchbox
@@ -144,7 +146,7 @@
     tree
 
   ];
-  
+
   services.gpm.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
