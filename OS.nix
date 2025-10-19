@@ -12,17 +12,11 @@
       inputs.home-manager.nixosModules.default
     ];
   
-  # If I'm not using a desktop environment, 
-  # this parameter is needed for home-manager
-  # to work properly.
-  programs.dconf.enable = true;
-
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "pc"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
@@ -53,6 +47,12 @@
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
+  services.xserver.autorun = false;
+  services.xserver.exportConfiguration = true;
+
+  services.dbus.enable = true;
+  services.gnome.glib-networking.enable = true;
+
   services.xserver.displayManager.startx.enable = true;
 
   # If I want to enable the GNOME Desktop Environment.
@@ -74,6 +74,7 @@
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
@@ -100,8 +101,10 @@
   users.users.gustav = {
     isNormalUser = true;
     description = "Gustav";
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "video" "input" ];
   };
+
+  services.getty.autologinUser = "gustav";
 
   home-manager = {
     extraSpecialArgs = { inherit inputs; };
@@ -117,6 +120,9 @@
   boot.kernelModules = [ "kvm" "kvm-intel" ]; # "kvm-amd" if NixOS run on an AMD architecture.
   virtualisation.libvirtd.enable = true;
   users.groups.libvirtd.members = ["gustav"];
+  # If I'm not using a desktop environment, 
+  # this parameter is for the dconf qemu parameter.
+  programs.dconf.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
   services.tailscale.enable = true;
 
@@ -124,12 +130,22 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
 
-    fbterm # Add the following features to the CLI : mouse, scrolling, UTF-8, and 256-color.
+    fbterm # To manage the font-size terminal.
+    xorg.xinit
+    xterm
+    xorg.twm
 
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    openbox
+    i3
+    fvwm
+    matchbox
+    # awesome
+
     tree
 
   ];
+  
+  services.gpm.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -157,5 +173,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "25.05"; # Did you read the comment?
-
 }

@@ -21,25 +21,31 @@
   # release notes.
   home.stateVersion = "25.05"; # Please read the comment before changing.
 
-  # In order to be able to use x11docker (cf. bellow).
-  services.podman.enable = true;
-
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = with pkgs; [
+  home.packages = with pkgs; [ 
 
-    x11docker # In order to be able to launch GUI from CLI.
+    # Regarding launching GUI from CLI, x11docker doesn't use the 
+    # binary on the machine but use a new one at each new launch,
+    # also since x11docker launch the application in a container,
+    # the application may take more time to load, and to finish
+    # it was tricky to try x11docker.
 
+    vim
     git
     rustup
+    obconf
     
     # I prefer using the 'Epiphany' web browser rather
     # than Firefox; I found Epiphany more sexy 🔥 ;).
-    epiphany
+    # However this browser is hard to install so I forsake it.
+    # Instead of epiphany I've found qutebrowser that looks
+    # great also.
+    qutebrowser
    
-    # However Epiphany doesn't have passkey implented yet,
-    # so if I need to connect to an account with my YubiKey
-    # I would simply use Firefox at the moment.
+    # However qutebrowser (nor Epiphany) doesn't have passkey 
+    # implented yet, so if I need to connect to an account 
+    # with my YubiKey I would simply use Firefox at the moment.
     firefox
 
     # Mes clés SSH sont stockées sur YubiKey.
@@ -93,6 +99,24 @@
     PKCS11Provider "${pkgs.yubico-piv-tool}/lib/libykcs11.so"
   '';
 
+  # To have a more powerful terminal: tmux.
+  programs.tmux.enable = true;
+
+  # To start with a tmux shell rather than on a bash one.
+  programs.bash = {
+    enable = true;
+    initExtra = ''
+      if [[ "$(tty)" =~ /dev/tty ]] && [[ -z "$TMUX" ]]; then
+        SHELL=tmux exec fbterm
+      fi
+    '';
+  };
+
+  # To desactivate Ctrl+Z since it can force the user to switch off the computer.
+  programs.tmux.extraConfig = ''
+    unbind-key C-z
+  '';
+
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
@@ -106,6 +130,38 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+   
+    ".config/openbox/rc.xml".source = pkgs.writeText "openbox-rc.xml" ''
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!-- Configuration Openbox générée pour NixOS -->
+      <openbox_config xmlns="http://openbox.org/3.4/rc">
+        <!-- Vos autres sections ici (thèmes, raccourcis, etc.) -->
+        <!-- Exemple basique pour les applications -->
+        <applications>
+          <!-- Règle pour Qutebrowser : pas de décorations -->
+          <application class="qutebrowser">
+            <decor>no</decor>  <!-- Désactive les décorations (barre de titre, bordures) -->
+            <!-- Optionnel : maximiser par défaut -->
+            <!-- <maximized>yes</maximized> -->
+          </application>
+          <application class="firefox">
+            <decor>no</decor>  <!-- Désactive les décorations (barre de titre, bordures) -->
+            <!-- Optionnel : maximiser par défaut -->
+            <!-- <maximized>yes</maximized> -->
+          </application>
+        </applications>
+        <mouse>
+          <context name="Root">
+            <mousebind button="Right" action="Press">
+              <action name="ShowMenu">
+                <menu>root-menu</menu>
+              </action>
+            </mousebind>
+          </context>
+        </mouse>
+      </openbox_config>
+    '';
+
   };
 
   # Home Manager can also manage your environment variables through
