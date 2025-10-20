@@ -1,3 +1,4 @@
+
 { config, pkgs, ... }:
 
 {
@@ -136,10 +137,101 @@
     '';
   };
 
-  # To start with a tmux shell rather than on a bash one.
+  # Configuration bash complète avec traçage automatique des alias
   programs.bash = {
     enable = true;
+    
+    # Configuration de l'historique
+    shellOptions = [
+      "histappend"   # Append to history file
+      "checkwinsize" # Check window size after each command
+      "extglob"      # Extended pattern matching
+      "globstar"     # Enable ** pattern
+      "checkjobs"    # Check jobs before exit
+    ];
+    
+    historyControl = [ "ignoreboth" ]; # Ignore duplicates and spaces
+    historyFileSize = 2000;
+    historySize = 1000;
+    
+    # Variables d'environnement
+    sessionVariables = {
+      HISTFILESIZE = "100000";
+      HISTSIZE = "10000";
+      PGDATA = "$HOME/postgres_data";
+      PGHOST = "/tmp";
+      PGPORT = "5432";
+    };
+    
+    # Alias - ils seront automatiquement tracés
+    shellAliases = {
+      # Navigation
+      ll = "ls -alF";
+      la = "ls -A";
+      l = "ll";
+      c = "cd";
+      "c.." = "cd ..";
+      cl = "clear";
+      cll = "clear && ls";
+      clr = "clear";
+      o = "open .";
+      
+      # Éditeurs
+      v = "vim";
+      m = "man";
+      bashrc = "vim ~/.bashrc";
+      b = "vim ~/.bashrc";
+
+      "?" = "git status";
+      
+      # Cargo
+      cr = "cargo run";
+      cb = "cargo build";
+      ca = "cargo add";
+      
+      # Applications
+      j = "jobs";
+      ytm = "musique";
+      mu = "musique";
+      msq = "musique";
+      music = "musique";
+      
+      # Utilitaires
+      s = "source ~/.bashrc";
+      rst = "reset";
+      f = "find /home/gustav/ -name";
+      reset = "reset && clear";
+      x = "sudo sh /home/gustav/.scripts/x.sh";
+      
+    };
+    
+    # Configuration bash étendue avec traçage automatique des alias
     initExtra = ''
+      
+      # Configuration du prompt
+      PS1="Done.\n\n"
+      
+      __prompt_to_bottom_line() {
+          tput cup $LINES
+      }
+      __prompt_to_bottom_line
+      
+      # Configuration du prompt command
+      PROMPT_COMMAND='echo -ne "\033]0;$$ ''${BRANCH} ''${PWD/#\$HOME} \007"'
+      
+      # Configuration des couleurs pour ls et grep
+      if [ -x /usr/bin/dircolors ]; then
+          test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+          alias ls='ls --color=auto'
+          alias grep='grep --color=auto'
+          alias fgrep='fgrep --color=auto'
+          alias egrep='egrep --color=auto'
+      fi
+      
+      # Ajout au PATH
+      export PATH="$PATH:/home/gustav/.local/jdk-21.0.1+12/bin:/home/gustav/.local/ghidra_10.4_PUBLIC:/home/gustav/Bureau/ngl/target/debug/:/home/gustav/Téléchargements/ideaIU-2023.3.3/idea-IU-233.14015.106/bin/:/usr/lib/postgresql/16/bin/"
+      
+      # To start with a tmux shell rather than on a bash one.
       if [[ "$(tty)" =~ /dev/tty ]] && [[ -z "$TMUX" ]]; then
         SHELL=tmux exec fbterm
       fi
@@ -153,6 +245,73 @@
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
     # ".screenrc".source = dotfiles/screenrc;
+
+    # To be able to launch GUI.
+    "/home/gustav/.scripts/x.sh" = {
+      text = ''
+#!/bin/sh
+
+# Chemins generiques NixOS
+USERBIN="/home/gustav/.nix-profile/bin"
+SYSBIN="/run/current-system/sw/bin"
+SYSLIB="/run/current-system/sw/libexec"
+
+if [ -n "$1" ]; then
+    # Mode avec application
+    APP="$1"
+
+    if [ -x "$USERBIN/$APP" ]; then
+        APP_PATH="$USERBIN/$APP"
+    elif [ -x "$SYSBIN/$APP" ]; then
+        APP_PATH="$SYSBIN/$APP"
+    else
+        echo "Application '$APP' not found in '$USERBIN' nor in '$SYSBIN'."
+        exit 1 
+    fi
+
+    xinit /usr/bin/env bash <<EOF
+#!/usr/bin/env bash
+
+su gustav
+
+''${SYSBIN}/openbox --config-file /home/gustav/.config/openbox/rc.xml & 
+
+eval "$(dbus-launch --sh-syntax)"
+
+# Services GMOME falcutatifs
+[ -x "''${SYSLIB}/dconf-service" ] && "''${SYSLIB}/dconf-service" &
+[ -x "''${SYSLIB}/gvfsd" ] && "''${SYSLIB}/gvfsd" &
+[ -x "''${SYSLIB}/xdg-desktop-portal" ] && "''${SYSLIB}/xdg-desktop-portal" &
+
+# since this script apprently needs to be run in root
+# we goes back to gustav to find the asked app.
+
+"''${APP_PATH}"
+EOF
+
+else
+    # Mode sans application - juste openbox
+    xinit /usr/bin/env bash <<EOF
+#!/usr/bin/env bash
+
+su gustav
+
+''${SYSBIN}/openbox --config-file /home/gustav/.config/openbox/rc.xml & 
+
+eval "$(dbus-launch --sh-syntax)"
+
+# Services GMOME falcutatifs
+[ -x "''${SYSLIB}/dconf-service" ] && "''${SYSLIB}/dconf-service" &
+[ -x "''${SYSLIB}/gvfsd" ] && "''${SYSLIB}/gvfsd" &
+[ -x "''${SYSLIB}/xdg-desktop-portal" ] && "''${SYSLIB}/xdg-desktop-portal" &
+
+# Attendre indéfiniment (ou jusqu'à ce qu'openbox se termine)
+wait
+EOF
+fi
+      '';
+      executable = true;
+    };
 
     # # You can also set the file content immediately.
     # ".gradle/gradle.properties".text = ''
