@@ -171,9 +171,10 @@
       l = "ll";
       c = "cd";
       "c.." = "cd ..";
+      clear = "clear_n_bottom";
       cl = "clear";
-      cll = "clear && ls";
       clr = "clear";
+      cll = "clear && ls";
       o = "open .";
       
       # Éditeurs
@@ -182,7 +183,12 @@
       bashrc = "vim ~/.bashrc";
       b = "vim ~/.bashrc";
 
+      # Git
       "?" = "git status";
+      "ga" = "git add";
+      "gc" = "git commit -m";
+      "gp" = "git push";
+      "gl" = "git log";
       
       # Cargo
       cr = "cargo run";
@@ -208,13 +214,18 @@
     # Configuration bash étendue avec traçage automatique des alias
     initExtra = ''
       
-      # Configuration du prompt
-      PS1="Done.\n\n"
-      
       __prompt_to_bottom_line() {
           tput cup $LINES
       }
       __prompt_to_bottom_line
+      
+      # Configuration du prompt
+      PS1="Done.\n\n"
+
+      clear_n_bottom() {
+	command clear
+	__prompt_to_bottom_line
+      }
       
       # Configuration du prompt command
       PROMPT_COMMAND='echo -ne "\033]0;$$ ''${BRANCH} ''${PWD/#\$HOME} \007"'
