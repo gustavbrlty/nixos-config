@@ -25,6 +25,8 @@
   # environment.
   home.packages = with pkgs; [ 
 
+    xclip
+
     # Regarding launching GUI from CLI, x11docker doesn't use the 
     # binary on the machine but use a new one at each new launch,
     # also since x11docker launch the application in a container,
@@ -39,8 +41,11 @@
     # than Firefox; I found Epiphany more sexy 🔥 ;).
     # However this browser is hard to install so I forsake it.
     # Instead of epiphany I've found qutebrowser that looks
-    # great also.
-    qutebrowser
+    # great also. However, I prefer using only one web browser
+    # rather than two for separate tasks (firefox being used when
+    # I need to authentificate with a Yubikey). So I would finally
+    # at the moment only use firefox.
+    # qutebrowser
    
     # However qutebrowser (nor Epiphany) doesn't have passkey 
     # implented yet, so if I need to connect to an account 
@@ -65,6 +70,9 @@
     # (pkgs.writeShellScriptBin "my-hello" ''
     #   echo "Hello, ${config.home.username}!"
     # '')
+
+    flameshot # To be able to take screenshots.
+
   ];
 
   programs.obs-studio = {
@@ -110,7 +118,23 @@
   '';
 
   # To have a more powerful terminal: tmux.
-  programs.tmux.enable = true;
+  programs.tmux = {
+    enable = true;
+    extraConfig = ''
+      # To desactivate Ctrl+Z since it can force the user to switch off the computer.
+      unbind-key C-z
+
+      # Entrer en mode copie avec Prefix + [
+      bind [ copy-mode
+    
+      # En mode copie : Enter ou 'y' pour copier vers le clipboard X11
+      bind -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "xclip -selection clipboard -i"
+      bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xclip -selection clipboard -i"
+    
+      # Sélection visuelle avec la souris (sans interférence tmux)
+      set -g @plugin 'tmux-plugins/tmux-sensible'
+    '';
+  };
 
   # To start with a tmux shell rather than on a bash one.
   programs.bash = {
@@ -121,11 +145,6 @@
       fi
     '';
   };
-
-  # To desactivate Ctrl+Z since it can force the user to switch off the computer.
-  programs.tmux.extraConfig = ''
-    unbind-key C-z
-  '';
 
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
@@ -160,11 +179,12 @@
 <!-- <maximized>yes</maximized> -->
 </application>
 </applications>
+
 <mouse>
 <!-- CONTEXTE RACINE (bureau) -->
 <context name="Root">
-<!-- Menu sur clic droit du bureau -->
-<mousebind button="Right" action="Press">
+<!-- Menu Openbox sur Ctrl + clic droit du bureau -->
+<mousebind button="C-Right" action="Press">
 <action name="ShowMenu">
 <menu>root-menu</menu>
 </action>
@@ -173,8 +193,8 @@
 
 <!-- CONTEXTE FRAME (cadre de fenêtre) -->
 <context name="Frame">
-<!-- Menu sur clic droit du cadre -->
-<mousebind button="Right" action="Press">
+<!-- Menu Openbox sur Ctrl + clic droit du cadre -->
+<mousebind button="C-Right" action="Press">
 <action name="ShowMenu">
 <menu>client-menu</menu>
 </action>
@@ -193,8 +213,8 @@
 
 <!-- CONTEXTE TITLEBAR (barre de titre) -->
 <context name="Titlebar">
-<!-- Menu sur clic droit de la barre de titre -->
-<mousebind button="Right" action="Press">
+<!-- Menu Openbox sur Ctrl + clic droit de la barre de titre -->
+<mousebind button="C-Right" action="Press">
 <action name="ShowMenu">
 <menu>client-menu</menu>
 </action>
@@ -211,70 +231,90 @@
 </mousebind>
 </context>
 
-<!-- BORDS - Redimensionnement unidirectionnel -->
+<!-- CONTEXTE CLIENT (contenu de l'application) -->
+<context name="Client">
+<!-- Clic droit simple - donner le focus et laisser l'application gérer -->
+<mousebind button="Right" action="Click">
+<action name="Focus"/>
+<action name="Activate"/>
+</mousebind>
+
+<!-- Menu Openbox sur Ctrl + clic droit -->
+<mousebind button="C-Right" action="Press">
+<action name="ShowMenu">
+<menu>client-menu</menu>
+</action>
+</mousebind>
+</context>
+
+<!-- Boutons de la barre de titre -->
+<context name="Close">
+<mousebind button="Left" action="Click">
+<action name="Close"/>
+</mousebind>
+</context>
+
+<context name="Iconify">
+<mousebind button="Left" action="Click">
+<action name="Iconify"/>
+</mousebind>
+</context>
+
+<context name="Maximize">
+<mousebind button="Left" action="Click">
+<action name="ToggleMaximize"/>
+</mousebind>
+</context>
+
+<!-- Bords et coins (configuration inchangée) -->
 <context name="Top">
 <mousebind button="Left" action="Drag">
-<action name="Resize">
-<edge>top</edge>
-</action>
+<action name="Resize"><edge>top</edge></action>
 </mousebind>
 </context>
 
 <context name="Bottom">
 <mousebind button="Left" action="Drag">
-<action name="Resize">
-<edge>bottom</edge>
-</action>
+<action name="Resize"><edge>bottom</edge></action>
 </mousebind>
 </context>
 
 <context name="Left">
 <mousebind button="Left" action="Drag">
-<action name="Resize">
-<edge>left</edge>
-</action>
+<action name="Resize"><edge>left</edge></action>
 </mousebind>
 </context>
 
 <context name="Right">
 <mousebind button="Left" action="Drag">
-<action name="Resize">
-<edge>right</edge>
-</action>
+<action name="Resize"><edge>right</edge></action>
 </mousebind>
 </context>
 
 <context name="TLCorner">
 <mousebind button="Left" action="Drag">
-<action name="Resize"/>
-</mousebind>
-</context>
-<context name="TRCorner">
-<mousebind button="Left" action="Drag">
-<action name="Resize"/>
-</mousebind>
-</context>
-<context name="BLCorner">
-<mousebind button="Left" action="Drag">
-<action name="Resize"/>
-</mousebind>
-</context>
-<context name="BRCorner">
-<mousebind button="Left" action="Drag">
-<action name="Resize"/>
+<action name="Resize"><edge>top</edge><edge>left</edge></action>
 </mousebind>
 </context>
 
-<context name="Desktop">
-<mousebind button="Up" action="Click">
-<action name="GoToDesktop"><to>previous</to></action>
+<context name="TRCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"><edge>top</edge><edge>right</edge></action>
 </mousebind>
-<mousebind button="Down" action="Click">
-<action name="GoToDesktop"><to>next</to></action>
+</context>
+
+<context name="BLCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"><edge>bottom</edge><edge>left</edge></action>
+</mousebind>
+</context>
+
+<context name="BRCorner">
+<mousebind button="Left" action="Drag">
+<action name="Resize"><edge>bottom</edge><edge>right</edge></action>
 </mousebind>
 </context>
 </mouse>
-
 <keyboard>
 <!-- Navigation entre bureaux -->
 <keybind key="C-A-Left">
