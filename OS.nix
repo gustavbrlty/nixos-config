@@ -8,8 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware/common.nix
-      ./modules/wifi.nix
-.nix
+      ./modules/network.nix
       inputs.home-manager.nixosModules.default
     ];
   

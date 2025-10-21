@@ -22,6 +22,16 @@
         psk = "Amen ve amen";
       };
 
+      "IONIS" = {
+        auth = ''
+          key_mgmt=WPA-EAP
+          eap=PEAP
+          phase2="auth=MSCHAPV2"
+          identity="gustav.berloty@epita.fr"
+          password="|P3zh^yy"
+        '';
+      };
+
       "BNF" = {
         auth = ''
           key_mgmt=NONE
