@@ -37,6 +37,13 @@
     vim
     git
     rustup
+
+    # To be able to use GUI.
+    xorg.xinit
+    xterm
+    xorg.twm
+    openbox # Windows manager.
+    # obconf not that useful.
     
     # I prefer using the 'Epiphany' web browser rather
     # than Firefox; I found Epiphany more sexy 🔥 ;).
@@ -207,7 +214,8 @@
       rst = "reset";
       f = "find /home/gustav/ -name";
       reset = "reset && clear";
-      x = "sudo sh /home/gustav/.scripts/x.sh";
+      x = "sh /home/gustav/.scripts/x.sh";
+      off="shutdown now"; # todo: demander une confirmation
       
     };
     
@@ -280,12 +288,13 @@ if [ -n "$1" ]; then
         exit 1 
     fi
 
-    xinit /usr/bin/env bash <<EOF
+    # Apparently xinit needs to be launched by a super user.
+    sudo xinit /usr/bin/env bash <<EOF
 #!/usr/bin/env bash
 
-su gustav
+su gustav # As we execute xinit with root we are root but we go back to our user.
 
-''${SYSBIN}/openbox --config-file /home/gustav/.config/openbox/rc.xml & 
+''${USERBIN}/openbox --config-file /home/gustav/.config/openbox/rc.xml & 
 
 eval "$(dbus-launch --sh-syntax)"
 
@@ -302,12 +311,14 @@ EOF
 
 else
     # Mode sans application - juste openbox
-    xinit /usr/bin/env bash <<EOF
+
+    # Apparently xinit needs to be launched by a super user.
+    sudo xinit /usr/bin/env bash <<EOF
 #!/usr/bin/env bash
 
-su gustav
+su gustav # As we execute xinit with root we are root but we go back to our user.
 
-''${SYSBIN}/openbox --config-file /home/gustav/.config/openbox/rc.xml & 
+''${USERBIN}/openbox --config-file /home/gustav/.config/openbox/rc.xml & 
 
 eval "$(dbus-launch --sh-syntax)"
 
