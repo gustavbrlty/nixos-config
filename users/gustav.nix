@@ -89,15 +89,10 @@
 
     extraVimConfig = ''
       " Configuration supplémentaire personnelle
-      colorscheme nord
+      colorscheme unokai
       set background=dark
 
-      " Raccourcis personnalisés
-      nmap <leader>f :RustFmt<CR>
-      nmap <leader>s :RustRun<CR>
-
       " Raccourcis Copilot supplémentaires
-      nmap <leader>cc :Copilot panel<CR>
       imap <silent> <C-\> <Plug>(copilot-suggest)
     '';
   };
@@ -171,6 +166,18 @@
     
       # Sélection visuelle avec la souris (sans interférence tmux)
       set -g @plugin 'tmux-plugins/tmux-sensible'
+
+      set -g default-terminal "screen-256color"
+      set -ag terminal-overrides ",xterm-256color:RGB"
+      set -g focus-events on
+
+      # Améliorer le support des couleurs
+      set -g default-terminal "tmux-256color"
+      set -as terminal-overrides ',xterm*:Tc:sitm=\E[3m'
+
+      # Raccourcis pour changer la taille de police dans Tmux
+      bind-key + select-layout main-horizontal \; resize-pane -Z
+      bind-key - select-layout main-vertical \; resize-pane -Z
     '';
   };
 
