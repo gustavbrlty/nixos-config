@@ -79,11 +79,6 @@
     #media-session.enable = true;
   };
 
-  # Active le démon pour communiquer avec les cartes à puce (utile pour la YubiKey).
-  services.pcscd.enable = true;
-  # Ajoute les règles udev pour que le système reconnaisse la YubiKey
-  services.udev.packages = [ pkgs.yubikey-personalization ];
-
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -92,7 +87,9 @@
   users.users.gustav = {
     isNormalUser = true;
     description = "Gustav";
-    extraGroups = [ "wheel" "video" "input" ];
+    extraGroups = [ "wheel" "video" "input" 
+      "plugdev" # Pour la YubiKey.
+    ];
   };
 
   services.getty.autologinUser = "gustav";
@@ -116,6 +113,10 @@
   programs.dconf.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
   services.tailscale.enable = true;
+  # Active le démon pour communiquer avec les cartes à puce (utile pour la YubiKey).
+  services.pcscd.enable = true;
+  # Ajoute les règles udev pour que le système reconnaisse la YubiKey
+  services.udev.packages = [ pkgs.yubikey-personalization ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget

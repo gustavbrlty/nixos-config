@@ -6,6 +6,7 @@
   # We want the user to be able to use qemu.
   imports = [
     ../modules/qemu_virtu.nix
+    ../modules/rusty-vim.nix
   ];
 
   # Home Manager needs a bit of information about you and the paths it should
@@ -28,15 +29,13 @@
 
     xclip
 
+    # vscode
+
     # Regarding launching GUI from CLI, x11docker doesn't use the 
     # binary on the machine but use a new one at each new launch,
     # also since x11docker launch the application in a container,
     # the application may take more time to load, and to finish
     # it was tricky to try x11docker.
-
-    vim
-    git
-    rustup
 
     # To be able to use GUI.
     xorg.xinit
@@ -58,13 +57,14 @@
     # However qutebrowser (nor Epiphany) doesn't have passkey 
     # implented yet, so if I need to connect to an account 
     # with my YubiKey I would simply use Firefox at the moment.
-    firefox
+    # firefox
 
     vlc
 
     # Mes clés SSH sont stockées sur YubiKey.
     yubikey-manager
     yubico-piv-tool
+    pcsc-tools
     
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
@@ -83,6 +83,25 @@
 
   ];
 
+  programs.rust-vim = {
+    enable = true;
+    copilotEnabled = true;  # ← Active Copilot
+
+    extraVimConfig = ''
+      " Configuration supplémentaire personnelle
+      colorscheme nord
+      set background=dark
+
+      " Raccourcis personnalisés
+      nmap <leader>f :RustFmt<CR>
+      nmap <leader>s :RustRun<CR>
+
+      " Raccourcis Copilot supplémentaires
+      nmap <leader>cc :Copilot panel<CR>
+      imap <silent> <C-\> <Plug>(copilot-suggest)
+    '';
+  };
+
   programs.obs-studio = {
     enable = true;
     plugins = with pkgs.obs-studio-plugins; [
@@ -92,9 +111,20 @@
     ];
   };
 
+  programs.firefox = {
+    enable = true;
+    package = pkgs.firefox-wayland;
+    policies = {
+      SecurityDevices = {
+        # Activer les tokens de sécurité
+        "YubiKey" = "";
+      };
+    };
+  };
+
   programs.git = {
     enable = true;
-    extraConfig = {
+    settings = {
       url."git@github-kylak:kylak".insteadOf = "git@github.com:kylak";
       url."git@github-gustavbrlty:gustavbrlty".insteadOf = "git@github.com:gustavbrlty";
       safe.directory = "/etc/nixos"; # To save the NixOS config.
@@ -143,6 +173,8 @@
       set -g @plugin 'tmux-plugins/tmux-sensible'
     '';
   };
+
+  nixpkgs.config.allowUnfree = true;
 
   # Configuration bash complète avec traçage automatique des alias
   programs.bash = {
